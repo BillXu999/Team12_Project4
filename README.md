@@ -281,6 +281,25 @@ Figure 3.4.1 shows that there seems to be no big difference between three models
 
 # 4. Conclusion and Discussion
 
+```{r include=FALSE}
+ctrl <- trainControl(method = "repeatedcv", 
+                     number = 3, 
+                     repeats = 3, 
+                     verboseIter = FALSE,
+                     sampling = "down")
+
+set.seed(42)
+model_rf_under <- caret::train(y ~ .,
+                               data = train_data,
+                               method = "rf",
+                               trControl = ctrl)
+final_under <- data.frame(actual = test_data$y,
+                          predict(model_rf_under, newdata = test_data, type = "prob"))
+final_under$predict <- ifelse(final_under$yes > 0.5, "yes", "no")
+final_under$predict <- as.factor(final_under$predict)
+cm_under <- confusionMatrix(final_under$predict, test_data$y)
+```
+
 Note that the dataset is highly unbalanced. The proposition of "yes" in response is much lower than that of "no". This issue will reduce the accuracy of our classifier. Therefore, here we are interested in the performance of the random forest model on the under-sampled data. The data are proprocessed by under-sampling the majority class "no" from our original dataset.
 
 
